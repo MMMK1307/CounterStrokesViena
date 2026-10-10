@@ -1,6 +1,7 @@
 import uuid
 from uuid import UUID
 
+import math
 import pandas as pd
 import enum
 from dataclasses import dataclass
@@ -53,24 +54,52 @@ class SmokingStatus(enum.StrEnum):
 
 @dataclass
 class PersonHealth:
+    id: UUID
     hypertension: bool
     heart_disease: bool
     avg_glucose_level: float
-    bmi: float
+    bmi: float | None
     smoking_status: SmokingStatus
     stroke: bool
     person_id: UUID
 
     @staticmethod
-    def create_from_series(data: pd.Series, person_id: UUID):
+    def create_from_db(data: tuple):
         return PersonHealth(
+            uuid.UUID(data[0]),
+            data[1],
+            data[2],
+            data[3],
+            data[4],
+            SmokingStatus(data[5]),
+            data[6],
+            uuid.UUID(data[7])
+        )
+
+    @staticmethod
+    def create_from_series(data: pd.Series, person_id: UUID):
+        bmi = float(data["bmi"])
+        return PersonHealth(
+            id=uuid.uuid4(),
             hypertension=bool(data['hypertension']),
             heart_disease=data['heart_disease'] == 1,
             avg_glucose_level=float(data["avg_glucose_level"]),
-            bmi=float(data["bmi"]),
+            bmi=bmi if not math.isnan(bmi) else None,
             smoking_status=SmokingStatus.create_from_str(data["smoking_status"]),
             stroke=bool(data["stroke"]),
             person_id=person_id,
+        )
+
+    def to_db_tuple(self):
+        return (
+            str(self.id),
+            self.hypertension,
+            self.heart_disease,
+            self.avg_glucose_level,
+            self.bmi,
+            self.smoking_status.value,
+            self.stroke,
+            str(self.person_id),
         )
 
 
@@ -86,13 +115,26 @@ class PersonData:
     health: PersonHealth
 
     @staticmethod
+    def create_from_db(data: tuple):
+        return PersonData(
+            uuid.UUID(data[0]),
+            data[1],
+            Gender(data[2]),
+            data[3],
+            data[4],
+            WorkType(data[5]),
+            ResidenceType(data[6]),
+            PersonHealth.create_from_db(data[7:])
+        )
+
+    @staticmethod
     def create_from_series(data: pd.Series):
         person_id = uuid.uuid4()
         return PersonData(
-            id=person_id ,
+            id=person_id,
             v_id=data["id"],
             gender=Gender(data["gender"].lower()),
-            age=data["age"],
+            age=float(data["age"]),
             ever_married=data['ever_married'] == "Yes",
             work_type=WorkType.create_from_str(data['work_type']),
             residence_type=ResidenceType(data['Residence_type'].lower()),
