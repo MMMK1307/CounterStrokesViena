@@ -4,7 +4,7 @@ from uuid import UUID
 import math
 import pandas as pd
 import enum
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 class Gender(enum.StrEnum):
@@ -147,6 +147,12 @@ class PersonData:
             self.age, self.ever_married,
             self.work_type.value, self.residence_type.value
         )
+
+    def to_dict(self) -> dict:
+        base_data = asdict(self)
+        del base_data["health"]
+        d = {f"health_{name}": value for name, value in asdict(self.health).items()}
+        return { **base_data, **d }
 
 
 @dataclass
