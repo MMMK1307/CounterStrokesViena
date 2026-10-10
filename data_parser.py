@@ -8,13 +8,17 @@ _RAW_DATA_PATH = "./data/s_data.csv"
 
 
 def get_raw_person_data():
-    return pd.read_csv(_RAW_DATA_PATH)
+    data: pd.DataFrame = pd.read_csv(_RAW_DATA_PATH)
+    data = data.dropna()
+    return data
 
 
 def parse_person_data(raw_data: pd.DataFrame):
     people_data = []
 
-    print("\n[ LOADING CSV DATA ] \n[", end="")
+    print("\n[ LOADING CSV DATA ]\n")
+    raw_data.info()
+    print("\n[", end="")
 
     for i, row in raw_data.iterrows():
         if i % (raw_data.shape[0] // 60) == 0:
