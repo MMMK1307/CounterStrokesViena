@@ -1,3 +1,4 @@
+from sqlite3 import Connection
 
 from data_parser import get_raw_person_data, parse_person_data, parse_people_into_db
 from db.base_db import init_db, connection
@@ -48,7 +49,8 @@ def work_type_renaming(s):
 
 
 def plotting(data: pd.DataFrame):
-    plot_op = int(input("[1] Age Distribution [2] Hypertension Comparison [3] Work Comparison\n> "))
+    print("\n[Plotting]")
+    plot_op = int(input("[1] Age Distribution [2] Hypertension Comparison [3] Work Comparison [0] Exit\n> "))
 
     match plot_op:
         case 1:
@@ -70,24 +72,51 @@ def plotting(data: pd.DataFrame):
     plt.show()
 
 
+def querying(conn: Connection):
+    option = 1
+    while option != 0:
+        print("\n[Querying]")
+        print("[1] AVC [2] Total Row Count [3] AVG Glucose on Name [0] Exit")
+        try:
+            option = int(input("> "))
+        except ValueError:
+            option = 5
+        print()
+
+        match option:
+            case 1:
+                stroken = PersonDb(conn).get_stroken()
+                print("People that had a stroke")
+                stroke_dataframe = pd.DataFrame([{"ID": str(person.id), "Gender": person.gender, "Ever married": person.ever_married, "WorkType": person.work_type.name} for person in stroken ])
+                with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+                    print(stroke_dataframe)
+            case 2:
+                total_rows = PersonDb(conn).count_rows()
+                print("Row Count: ", total_rows)
+            case 3:
+                avg_glucose = PersonDb(conn).get_people_avg_glucose_level()
+                print("Population AVG Glucose Level: ", round(avg_glucose, 2))
+
+
 def menu(people_data: list[PersonData]):
     option = 1
     people_frame = pd.DataFrame(person_data.to_dict() for person_data in people_data)
     while option != 0:
         print("\n[MENU]")
-        print("[1] Stroke Studies [2] Plotting [0] exit")
-
+        print("[1] Stroke Studies [2] Plotting [3] Queries [0] exit")
         try:
             option = int(input("> "))
         except ValueError:
             option = 5
-
         print()
         match option:
             case 1:
                 stroke_studies(people_frame)
             case 2:
                 plotting(people_frame)
+            case 3:
+                with connection() as conn:
+                    querying(conn)
 
 def main():
     init_db()

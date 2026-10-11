@@ -31,12 +31,12 @@ class PersonDb:
         cursor.close()
         return count
 
-    def get_stoken(self) -> list[PersonData]:
+    def get_stroken(self) -> list[PersonData]:
         cursor = self.conn.cursor()
         db_data = cursor.execute("""
             SELECT *
             FROM person_data person
-            JOIN person_health health on person.id = health.person_id;
+            JOIN person_health health on person.id = health.person_id
             WHERE health.stroke = 1;
         """).fetchall()
         people_data = []
@@ -45,13 +45,12 @@ class PersonDb:
         cursor.close()
         return people_data
 
-    def get_people_avg_glucose_level(self, name: str) -> float:
+    def get_people_avg_glucose_level(self) -> float:
         cursor = self.conn.cursor()
         avg = cursor.execute("""
             SELECT AVG(health.avg_glucose_level)
             FROM person_data person
             JOIN person_health health on person.id = health.person_id;
-            WHERE person.name like '%?%'
-        """, name).fetchone()[0]
+        """).fetchone()[0]
         cursor.close()
         return avg

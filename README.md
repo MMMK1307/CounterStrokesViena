@@ -12,16 +12,16 @@ A idade média de pessoas que sofreram um AVC é 67 anos com 50% das sofrendo um
 Na base de dados a pessoa mais jovem a ter um AVC tinha menos de 2 anos
 
 ### Hipertensão
-Por volta de 28% das pessoas que sofreram um AVC sofriam com hipertensão
+Por volta de 19% das pessoas que sofreram um AVC sofriam com hipertensão
 
 ### Problemas no Coração
 É correlacionado com 19% dos casos
 
 ### Glicose
-É considerada alta a Glicose acima de 100mg/dl e mais de 55% dos casos estão relacionados com a glicose alta
+É considerada alta a Glicose acima de 100mg/dl e mais de 54% dos casos estão relacionados com a glicose alta
 
 ### IMC
-O Indice de Massa Corporal é alto quando acima de 25. E está presente em quase 82% dos casos de AVC
+O Indice de Massa Corporal é alto quando acima de 25. E está presente em quase 84% dos casos de AVC
 
 ### Tabagismo
 Dos casos de AVC 44% dos pacientes informaram que já haviam fumado ou praticavam ativamente o tabagismo

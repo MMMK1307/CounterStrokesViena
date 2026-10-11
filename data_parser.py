@@ -9,6 +9,8 @@ _RAW_DATA_PATH = "./data/s_data.csv"
 
 def get_raw_person_data():
     data: pd.DataFrame = pd.read_csv(_RAW_DATA_PATH)
+    bmi_avg = data["bmi"].mean()
+    data["bmi"] = data["bmi"].fillna(bmi_avg)
     data = data.dropna()
     return data
 
