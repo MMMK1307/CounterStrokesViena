@@ -1,4 +1,5 @@
 import uuid
+from unittest import case
 from uuid import UUID
 
 import math
@@ -26,6 +27,22 @@ class WorkType(enum.StrEnum):
         if value == "self-employed":
             return WorkType.SelfEmployed
         return WorkType(value)
+
+    @staticmethod
+    def get_label(value: str | WorkType):
+        if not isinstance(value, WorkType):
+            value = WorkType(value)
+        match value:
+            case WorkType.Private:
+                return "Privado"
+            case WorkType.SelfEmployed:
+                return "Independente"
+            case WorkType.Gov:
+                return "Governamental"
+            case WorkType.Children:
+                return "Criança"
+            case WorkType.NeverWorked:
+                return "Criança"
 
 
 class ResidenceType(enum.StrEnum):

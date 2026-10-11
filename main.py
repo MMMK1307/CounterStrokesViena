@@ -3,8 +3,9 @@ from data_parser import get_raw_person_data, parse_person_data, parse_people_int
 from db.base_db import init_db, connection
 from db.config_db import ConfigDb
 from db.person_db import PersonDb
-from models import PersonData, SmokingStatus
+from models import PersonData, SmokingStatus, WorkType
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def stroke_studies(data: pd.DataFrame):
@@ -35,8 +36,38 @@ def stroke_studies(data: pd.DataFrame):
         print(f" > {SmokingStatus(index).name}: {value}")
 
 
+def age_tenths(age: int):
+    if age < 10:
+        return 10
+    tenth = age // 10
+    return int(tenth * 10)
+
+
+def work_type_renaming(s):
+    return WorkType.get_label(s)
+
+
 def plotting(data: pd.DataFrame):
-    print("")
+    plot_op = int(input("[1] Age Distribution [2] Hypertension Comparison [3] Work Comparison\n> "))
+
+    match plot_op:
+        case 1:
+            have_stroked = data.loc[data["health_stroke"] == 1]
+            d = have_stroked["age"].apply(age_tenths)
+            d.groupby(d).count().plot(kind="pie")
+            plt.title("Distribuição por Idade \nIdades comprimidas ao digito mais relevante. 73 -> 70 ou 59 -> 50")
+        case 2:
+            d = data.loc[(data["health_hypertension"] == 1) | (data["health_stroke"] == 1)].groupby(["health_stroke", "health_hypertension"])["id"].count()
+            d = d.rename({0: "N", 1: "S"})
+            d.plot(kind="bar", xlabel="AVC, Hipertensão \n S = Sim | N = Não", ylabel="Quantidade Pessoas")
+            plt.title("Comparação Hipertensão")
+        case 3:
+            have_stroked = data.loc[data["health_stroke"] == 1]
+            have_stroked['work_type'] = have_stroked['work_type'].apply(work_type_renaming)
+            have_stroked.groupby("work_type")["id"].count().plot(kind="bar", ylabel="Tipo Trabalho", xlabel="Quantidade Pessoas")
+            plt.title("Comparação Tipo de Trabalho")
+
+    plt.show()
 
 
 def menu(people_data: list[PersonData]):
@@ -44,7 +75,7 @@ def menu(people_data: list[PersonData]):
     people_frame = pd.DataFrame(person_data.to_dict() for person_data in people_data)
     while option != 0:
         print("\n[MENU]")
-        print("[1] Stroke Studies [2] PLOTS [0] exit")
+        print("[1] Stroke Studies [2] Plotting [0] exit")
 
         try:
             option = int(input("> "))
@@ -55,12 +86,8 @@ def menu(people_data: list[PersonData]):
         match option:
             case 1:
                 stroke_studies(people_frame)
-
-
-
-
-
-
+            case 2:
+                plotting(people_frame)
 
 def main():
     init_db()
