@@ -76,7 +76,7 @@ def querying(conn: Connection):
     option = 1
     while option != 0:
         print("\n[Querying]")
-        print("[1] AVC [2] Total Row Count [3] AVG Glucose on Name [0] Exit")
+        print("[1] AVC [2] Total Row Count [3] AVG Glucose [0] Exit")
         try:
             option = int(input("> "))
         except ValueError:
